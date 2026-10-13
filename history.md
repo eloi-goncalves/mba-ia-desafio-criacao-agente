@@ -138,6 +138,47 @@ decisões, próximos passos e `status`.
 
 ---
 
+## 2026-10-13 — Phase 03: API, Runner/App, confirmações e persistência
+
+- **Fase:** Phase 03 (API) — execução.
+- **Entendimento:** expor o assistente pelo contrato oficial, com confirmação de
+  ações (Garantia 1) e persistência de sessão (Garantia 3).
+- **Objetivo:** API FastAPI + Runner + DatabaseSessionService (SQLite).
+- **Execução:**
+  - `app/runtime.py`: `DatabaseSessionService` (SQLite assíncrono via aiosqlite),
+    `Runner`, criação de sessão com apartamento no state, envio de mensagem e
+    resposta de confirmação (FunctionResponse `adk_request_confirmation`).
+    Confirmações pendentes derivadas dos eventos (call sem resposta) → base do 409.
+  - `app/api.py`: rotas do contrato (`POST /sessoes`, `.../mensagens`,
+    `.../confirmacoes`, `GET .../eventos`, `GET /apartamentos/{n}/reservas`,
+    `.../visitantes`), com 404 e 409.
+  - Dependências: `google-adk[db]`, `aiosqlite`, `greenlet` (SQLAlchemy async).
+- **Arquivos modificados:** `pyproject.toml`, `uv.lock`, `app/config.py`,
+  `app/runtime.py`, `app/api.py`, `tests/test_api.py`.
+- **Testes:** `uv run pytest -q` → 31 passaram (8 de contrato da API: 201, 404,
+  409, rotas de verificação, eventos vazios).
+- **Validação (sem modelo):** servidor subiu em `localhost:8000`; `restaurar`
+  populou os dados; `GET /apartamentos/101/reservas` → RSV-1377;
+  `GET /apartamentos/302/visitantes` → Marina Duarte; `POST /sessoes` → 201;
+  sessão inexistente → 404. Persistência: sessão criada antes do reinício
+  retornou 200 após reiniciar sem restaurar (Garantia 3).
+- **Commits:** sugerido abaixo.
+- **Evidências:** logs do uvicorn com status; `31 passed`; teste de reinício.
+- **Problemas:** `DatabaseSessionService` exigiu extra `[db]` + `greenlet` +
+  driver `sqlite+aiosqlite://` (corrigido).
+- **Bloqueios:** validação dos fluxos de conversa e da retomada de confirmação
+  depende de `GOOGLE_API_KEY` (fornecida pelo avaliador). A "armadilha silenciosa"
+  da dica será verificada na Phase 04 com chave, se disponível.
+- **Decisões:** `user_id` fixo ("morador"); apartamento no state; pendentes
+  derivadas dos eventos (409 natural para reenvio/id inexistente).
+- **Próximos passos:** Phase 04 (garantias finais, validação do fluxo, README).
+- **status:** `executada`
+
+> Sugestão de commit (pt-BR, Conventional Commits):
+> `feat: API FastAPI com Runner, confirmações e sessão persistida em SQLite`
+
+---
+
 ## Modelo para novas entradas
 
 ```

@@ -18,7 +18,7 @@ Mapa de execução (meta-planos → entregas):
 | Requisito (critério de aceite) | Artefato oficial | Implementação | Teste | Evidência | Status |
 | --- | --- | --- | --- | --- | --- |
 | `uv sync` sem erro, ADK série 2 `>=2.2.0` em versão exata | `pyproject.toml`, `uv.lock` | `google-adk==2.2.0` em [pyproject.toml](pyproject.toml) | `uv sync` | `ADK 2.2.0` importado | em andamento |
-| Comandos de subida e restauração deixam a API em `localhost:8000` | `README.md`, comandos | `scripts/restaurar.py` (restauração); subida na Phase 03 | — | — | em andamento |
+| Comandos de subida e restauração deixam a API em `localhost:8000` | `README.md`, comandos | `scripts/restaurar.py` + `uvicorn app.api:app` | subida manual validada | servidor respondeu 200 | em andamento |
 | `dados/` idêntico ao repositório base | `dados/` | somente leitura em [app/data_loader.py](app/data_loader.py) | `git status dados/` | sem alterações | executada |
 | Nenhuma chave versionada; `.env` fora; `.env.example` com variáveis | `.env.example`, `.gitignore` | [.env.example](.env.example), [.gitignore](.gitignore) | `git check-ignore` | `.env`/`var/` ignorados | executada |
 
@@ -36,8 +36,8 @@ Mapa de execução (meta-planos → entregas):
 | Reservar área com taxa gera pendência (área+data); nada grava antes | API confirmações | `reservar_area` em [app/tools.py](app/tools.py) | `test_reservar_area_com_taxa_pede_confirmacao` | pendente, sem gravar | em andamento |
 | Negar não grava | API confirmações | `reservar_area` em [app/tools.py](app/tools.py) | `test_reservar_area_negada_nao_grava` | status negada | em andamento |
 | Aprovar grava exatamente uma reserva | API confirmações | `reservar_area` em [app/tools.py](app/tools.py) | `test_reservar_area_confirmada_grava_uma_vez` | 1 reserva | em andamento |
-| Reenvio de confirmação já respondida → `409` | API confirmações | API na Phase 03 | — | — | pendente |
-| `id` não pendente → `409`, nada muda | API confirmações | API na Phase 03 | — | — | pendente |
+| Reenvio de confirmação já respondida → `409` | API confirmações | pendentes por eventos em [app/runtime.py](app/runtime.py); 409 em [app/api.py](app/api.py) | `test_confirmacao_id_inexistente_409` | 409 | em andamento |
+| `id` não pendente → `409`, nada muda | API confirmações | [app/api.py](app/api.py) (`responder_confirmacao`) | `test_confirmacao_id_inexistente_409` | 409, reservas intactas | em andamento |
 | Área sem taxa não gera confirmação | tools/reservas | `reservar_area` em [app/tools.py](app/tools.py) | `test_reservar_area_sem_taxa_nao_pede_confirmacao` | sem confirmação | em andamento |
 | Autorizar visitante gera pendência (nome+data), mesmo com "já confirmo" | tools/visitantes | `autorizar_visitante` em [app/tools.py](app/tools.py) | `test_autorizar_visitante_sempre_pede_confirmacao` | pendente, sem gravar | em andamento |
 
@@ -55,7 +55,7 @@ Mapa de execução (meta-planos → entregas):
 
 | Requisito | Artefato oficial | Implementação | Teste | Evidência | Status |
 | --- | --- | --- | --- | --- | --- |
-| Após reiniciar, sessão devolve os mesmos eventos e aceita novas mensagens | `SessionService` persistente | SQLite definido em [app/config.py](app/config.py) (`SESSION_DB_URL`) | — | — | em andamento |
+| Após reiniciar, sessão devolve os mesmos eventos e aceita novas mensagens | `SessionService` persistente | `DatabaseSessionService` em [app/runtime.py](app/runtime.py) | reinício manual do uvicorn | sessão retornou 200 após reiniciar | em andamento |
 | Reservas/cancelamentos/visitantes antes do reinício continuam; códigos não repetem | armazenamento persistente | [app/storage.py](app/storage.py) (SQLite) | `test_codigo_cancelado_nao_reaproveitado` | 8 testes ok | em andamento |
 
 ## Garantia 4 — o regulamento é consultado, não carregado
@@ -78,5 +78,5 @@ Mapa de execução (meta-planos → entregas):
 
 | Requisito | Artefato oficial | Implementação | Teste | Evidência | Status |
 | --- | --- | --- | --- | --- | --- |
-| Todas as rotas seguem o contrato (caminhos, campos, formatos, status) | API | — | — | — | pendente |
+| Todas as rotas seguem o contrato (caminhos, campos, formatos, status) | API | [app/api.py](app/api.py) | `tests/test_api.py` (8 testes) | 201/404/409/200 ok | em andamento |
 | README com Arquitetura, Garantias (arquivo+trecho reais) e Como rodar | `README.md` | — | — | — | pendente |

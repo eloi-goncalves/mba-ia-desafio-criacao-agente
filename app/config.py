@@ -25,8 +25,8 @@ VAR_DIR = RAIZ / "var"
 CONDOMINIO_DB = VAR_DIR / "condominio.db"
 SESSOES_DB = VAR_DIR / "sessoes.db"
 
-# URL de sessão persistente do ADK (SQLite), conforme dica oficial do desafio.
-SESSION_DB_URL = f"sqlite:///{SESSOES_DB}"
+# URL de sessão persistente do ADK (SQLite assíncrono), conforme dica oficial.
+SESSION_DB_URL = f"sqlite+aiosqlite:///{SESSOES_DB}"
 
 # Identificador da aplicação ADK.
 APP_NAME = "assistente-aurora"
