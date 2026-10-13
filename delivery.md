@@ -17,10 +17,10 @@ Mapa de execução (meta-planos → entregas):
 
 | Requisito (critério de aceite) | Artefato oficial | Implementação | Teste | Evidência | Status |
 | --- | --- | --- | --- | --- | --- |
-| `uv sync` sem erro, ADK série 2 `>=2.2.0` em versão exata | `pyproject.toml`, `uv.lock` | — | — | — | pendente |
-| Comandos de subida e restauração deixam a API em `localhost:8000` | `README.md`, comandos | — | — | — | pendente |
-| `dados/` idêntico ao repositório base | `dados/` | — | — | — | pendente |
-| Nenhuma chave versionada; `.env` fora; `.env.example` com variáveis | `.env.example`, `.gitignore` | — | — | — | pendente |
+| `uv sync` sem erro, ADK série 2 `>=2.2.0` em versão exata | `pyproject.toml`, `uv.lock` | `google-adk==2.2.0` em [pyproject.toml](pyproject.toml) | `uv sync` | `ADK 2.2.0` importado | em andamento |
+| Comandos de subida e restauração deixam a API em `localhost:8000` | `README.md`, comandos | `scripts/restaurar.py` (restauração); subida na Phase 03 | — | — | em andamento |
+| `dados/` idêntico ao repositório base | `dados/` | somente leitura em [app/data_loader.py](app/data_loader.py) | `git status dados/` | sem alterações | executada |
+| Nenhuma chave versionada; `.env` fora; `.env.example` com variáveis | `.env.example`, `.gitignore` | [.env.example](.env.example), [.gitignore](.gitignore) | `git check-ignore` | `.env`/`var/` ignorados | executada |
 
 ## Arquitetura
 
@@ -55,8 +55,8 @@ Mapa de execução (meta-planos → entregas):
 
 | Requisito | Artefato oficial | Implementação | Teste | Evidência | Status |
 | --- | --- | --- | --- | --- | --- |
-| Após reiniciar, sessão devolve os mesmos eventos e aceita novas mensagens | `SessionService` persistente | — | — | — | pendente |
-| Reservas/cancelamentos/visitantes antes do reinício continuam; códigos não repetem | armazenamento persistente | — | — | — | pendente |
+| Após reiniciar, sessão devolve os mesmos eventos e aceita novas mensagens | `SessionService` persistente | SQLite definido em [app/config.py](app/config.py) (`SESSION_DB_URL`) | — | — | em andamento |
+| Reservas/cancelamentos/visitantes antes do reinício continuam; códigos não repetem | armazenamento persistente | [app/storage.py](app/storage.py) (SQLite) | `test_codigo_cancelado_nao_reaproveitado` | 8 testes ok | em andamento |
 
 ## Garantia 4 — o regulamento é consultado, não carregado
 
@@ -70,9 +70,9 @@ Mapa de execução (meta-planos → entregas):
 
 | Requisito | Artefato oficial | Implementação | Teste | Evidência | Status |
 | --- | --- | --- | --- | --- | --- |
-| Duas aprovações simultâneas respondem `200` | API + armazenamento | — | — | — | pendente |
-| Após a disputa, soma exatamente uma reserva do salão em 2030-05-11 | armazenamento (constraint) | — | — | — | pendente |
-| Exclusividade vale no instante da gravação | armazenamento (constraint) | — | — | — | pendente |
+| Duas aprovações simultâneas respondem `200` | API + armazenamento | API na Phase 03 | — | — | em andamento |
+| Após a disputa, soma exatamente uma reserva do salão em 2030-05-11 | armazenamento (constraint) | índice único parcial em [app/storage.py](app/storage.py) | `test_exclusividade_na_gravacao` | 1 reserva vence | em andamento |
+| Exclusividade vale no instante da gravação | armazenamento (constraint) | `criar_reserva` + `idx_reserva_unica_ativa` em [app/storage.py](app/storage.py) | `test_exclusividade_na_gravacao` | 2ª gravação recusada | em andamento |
 
 ## Contrato e README
 

@@ -56,6 +56,44 @@ decisões, próximos passos e `status`.
 
 ---
 
+## 2026-10-13 — Phase 01: Fundação e infraestrutura
+
+- **Fase:** Phase 01 (fundação) — execução.
+- **Entendimento:** base técnica do projeto, habilitando Garantias 3
+  (persistência) e 5 (exclusividade na gravação).
+- **Objetivo:** projeto `uv`, ADK fixo, carregamento dos dados, armazenamento
+  persistente, `.env.example`, comando de restauração.
+- **Execução:**
+  - `uv` instalado (0.13.0); `pyproject.toml` com `google-adk==2.2.0` (versão do
+    curso, citada na dica como testada), `fastapi`, `uvicorn[standard]`,
+    `python-dotenv`; `uv.lock` gerado; `uv sync` sem erro.
+  - Pacote `app/`: `config.py` (caminhos/ambiente), `data_loader.py` (leitura
+    somente-leitura de `dados/`), `storage.py` (SQLite com índice único parcial
+    para exclusividade de reserva ativa por área+data).
+  - `scripts/restaurar.py` (comando de restauração).
+  - `.env.example` (sem valores) e `.gitignore` atualizado (`var/`, `*.db`).
+- **Arquivos modificados:** `pyproject.toml`, `uv.lock`, `.env.example`,
+  `.gitignore`, `app/*.py`, `scripts/*.py`, `tests/test_fundacao.py`.
+- **Testes:** `uv run pytest -q` → 8 passaram (carregamento, disponibilidade sem
+  vazamento, código único, exclusividade na gravação, cancelamento só do próprio
+  apartamento, código cancelado não reaproveitado, autorização de visitante).
+- **Validação:** ADK 2.2.0 importado; `dados/` intacto; `.env` e `var/` ignorados.
+- **Commits:** sugerido abaixo.
+- **Evidências:** saída de `uv sync`; `8 passed in 0.12s`; `git check-ignore` ok.
+- **Problemas:** `uv` não vinha instalado (instalado via script oficial); o
+  `.gitignore` inicial não cobria `var/`/`*.db` (corrigido).
+- **Bloqueios:** nenhum. (Execução end-to-end do modelo exige `GOOGLE_API_KEY`,
+  que será necessária nas fases com agentes; a fundação é testável sem chave.)
+- **Decisões:** SQLite como armazenamento (sessão persistente do ADK + dados do
+  condomínio); exclusividade via índice único parcial `WHERE ativa = 1`.
+- **Próximos passos:** Phase 02 (agentes ADK + tools).
+- **status:** `executada`
+
+> Sugestão de commit (pt-BR, Conventional Commits):
+> `feat: fundação do projeto (uv, ADK 2.2.0, carregamento de dados e storage SQLite)`
+
+---
+
 ## Modelo para novas entradas
 
 ```

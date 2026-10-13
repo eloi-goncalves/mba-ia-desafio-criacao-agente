@@ -1,0 +1,26 @@
+[project]
+name = "assistente-aurora"
+version = "0.1.0"
+description = "Assistente virtual do Residencial Aurora construído com Google ADK"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "google-adk==2.2.0",
+    "fastapi",
+    "uvicorn[standard]",
+    "python-dotenv",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "httpx",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.uv]
+package = false
