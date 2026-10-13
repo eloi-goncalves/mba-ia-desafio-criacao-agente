@@ -56,7 +56,7 @@ Mapa de execução (meta-planos → entregas):
 | Requisito | Artefato oficial | Implementação | Teste | Evidência | Status |
 | --- | --- | --- | --- | --- | --- |
 | Após reiniciar, sessão devolve os mesmos eventos e aceita novas mensagens | `SessionService` persistente | `DatabaseSessionService` em [app/runtime.py](app/runtime.py) | reinício manual do uvicorn | sessão retornou 200 após reiniciar | em andamento |
-| Reservas/cancelamentos/visitantes antes do reinício continuam; códigos não repetem | armazenamento persistente | [app/storage.py](app/storage.py) (SQLite) | `test_codigo_cancelado_nao_reaproveitado` | 8 testes ok | em andamento |
+| Reservas/cancelamentos/visitantes antes do reinício continuam; códigos não repetem | armazenamento persistente | [app/storage.py](app/storage.py) (SQLite) | `test_codigo_cancelado_nao_reaproveitado` + reinício manual | dados persistiram | em andamento |
 
 ## Garantia 4 — o regulamento é consultado, não carregado
 
@@ -70,13 +70,13 @@ Mapa de execução (meta-planos → entregas):
 
 | Requisito | Artefato oficial | Implementação | Teste | Evidência | Status |
 | --- | --- | --- | --- | --- | --- |
-| Duas aprovações simultâneas respondem `200` | API + armazenamento | API na Phase 03 | — | — | em andamento |
-| Após a disputa, soma exatamente uma reserva do salão em 2030-05-11 | armazenamento (constraint) | índice único parcial em [app/storage.py](app/storage.py) | `test_exclusividade_na_gravacao` | 1 reserva vence | em andamento |
-| Exclusividade vale no instante da gravação | armazenamento (constraint) | `criar_reserva` + `idx_reserva_unica_ativa` em [app/storage.py](app/storage.py) | `test_exclusividade_na_gravacao` | 2ª gravação recusada | em andamento |
+| Duas aprovações simultâneas respondem `200` | API + armazenamento | API + índice único em [app/storage.py](app/storage.py) | validação com modelo (avaliador) | determinístico coberto | em andamento |
+| Após a disputa, soma exatamente uma reserva do salão em 2030-05-11 | armazenamento (constraint) | índice único parcial em [app/storage.py](app/storage.py) | `test_disputa_simultanea_uma_reserva_vence` | 1 reserva vence | em andamento |
+| Exclusividade vale no instante da gravação | armazenamento (constraint) | `criar_reserva` + `busy_timeout` em [app/storage.py](app/storage.py) | `test_disputa_simultanea_uma_reserva_vence` | 2ª recusada, sem 500 | em andamento |
 
 ## Contrato e README
 
 | Requisito | Artefato oficial | Implementação | Teste | Evidência | Status |
 | --- | --- | --- | --- | --- | --- |
 | Todas as rotas seguem o contrato (caminhos, campos, formatos, status) | API | [app/api.py](app/api.py) | `tests/test_api.py` (8 testes) | 201/404/409/200 ok | em andamento |
-| README com Arquitetura, Garantias (arquivo+trecho reais) e Como rodar | `README.md` | — | — | — | pendente |
+| README com Arquitetura, Garantias (arquivo+trecho reais) e Como rodar | `README.md` | [README.md](README.md) | revisão manual | 3 seções com ponteiros reais | executada |

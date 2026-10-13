@@ -21,11 +21,12 @@ from app import config, data_loader
 def _conectar() -> Iterator[sqlite3.Connection]:
     """Abre uma conexão SQLite com chaves estrangeiras e row factory por nome."""
     config.garantir_var_dir()
-    conexao = sqlite3.connect(config.CONDOMINIO_DB, isolation_level=None)
+    conexao = sqlite3.connect(config.CONDOMINIO_DB, isolation_level=None, timeout=10)
     conexao.row_factory = sqlite3.Row
     try:
         conexao.execute("PRAGMA journal_mode = WAL")
         conexao.execute("PRAGMA foreign_keys = ON")
+        conexao.execute("PRAGMA busy_timeout = 5000")
         yield conexao
     finally:
         conexao.close()

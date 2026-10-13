@@ -179,6 +179,42 @@ decisões, próximos passos e `status`.
 
 ---
 
+## 2026-10-13 — Phase 04: Garantias finais, validação e README
+
+- **Fase:** Phase 04 (garantias finais + entrega) — execução.
+- **Entendimento:** fechar Garantia 5 (concorrência), revisar Garantias 1–4 e
+  entregar o README com Arquitetura, Garantias e Como rodar.
+- **Objetivo:** disputa concorrente resolvida no armazenamento; README de entrega
+  substituindo o enunciado.
+- **Execução:**
+  - [app/storage.py](app/storage.py): `PRAGMA busy_timeout` para serializar
+    gravações concorrentes; violação do índice único → recusa normal (sem 500).
+  - [tests/test_concorrencia.py](tests/test_concorrencia.py): duas gravações
+    simultâneas → exatamente uma vence.
+  - `README.md` reescrito (Arquitetura, Garantias com arquivos/trechos reais,
+    Como rodar). Enunciado preservado em [docs/README.md](docs/README.md).
+- **Arquivos modificados:** `app/storage.py`, `tests/test_concorrencia.py`,
+  `README.md`.
+- **Testes:** `uv run pytest -q` → 32 passaram (inclui disputa concorrente).
+- **Validação:** `dados/` intacto; ADK fixado `==2.2.0`; `.env`/`var/` ignorados.
+- **Commits:** sugerido abaixo.
+- **Evidências:** `32 passed`; `git status dados/` vazio; README com ponteiros reais.
+- **Problemas:** `README.md` substituído via arquivo temporário + `mv` (o
+  `create_file` não sobrescreve).
+- **Bloqueios:** validação end-to-end do fluxo do avaliador (passos 1–15) com o
+  modelo depende de `GOOGLE_API_KEY`; as partes determinísticas (contrato,
+  persistência, exclusividade, isolamento, regulamento) estão cobertas por testes.
+- **Decisões:** exclusividade por índice único parcial + `busy_timeout`; README
+  aponta arquivos e trechos existentes.
+- **Próximos passos:** avaliador roda o fluxo completo com a própria chave; se a
+  retomada de confirmação falhar (armadilha da dica), ajustar topologia/retomada.
+- **status:** `executada`
+
+> Sugestão de commit (pt-BR, Conventional Commits):
+> `feat: garantia de concorrência na reserva e README de entrega (arquitetura, garantias, como rodar)`
+
+---
+
 ## Modelo para novas entradas
 
 ```
