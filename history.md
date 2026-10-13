@@ -94,6 +94,50 @@ decisões, próximos passos e `status`.
 
 ---
 
+## 2026-10-13 — Phase 02: Agentes ADK e tools
+
+- **Fase:** Phase 02 (agentes + tools) — execução.
+- **Entendimento:** arquitetura multiagente com o apartamento vindo da sessão
+  (Garantia 2) e regulamento consultado sob demanda (Garantia 4).
+- **Objetivo:** agente principal + 3 especialistas e tools que leem/gravam pelo
+  storage.
+- **Execução:**
+  - `app/tools.py`: tools de reservas (consultar, disponibilidade, reservar,
+    cancelar), visitantes (consultar, autorizar) e regulamento. Apartamento lido
+    do `state` (`tool_context.state['apartamento']`). Confirmação via
+    `tool_context.request_confirmation(hint, payload)` para reserva com taxa e
+    para autorizar visitante (Garantia 1).
+  - `app/regulamento.py`: recuperador que divide o regulamento por artigo e
+    retorna apenas o trecho relevante (Garantia 4).
+  - `app/agentes.py`: `coordenador` (principal, sem regulamento nas instruções) +
+    `especialista_reservas`, `especialista_visitantes`, `especialista_regulamento`
+    (via `sub_agents`). Modelo Gemini configurável (`GEMINI_MODEL`).
+- **Arquivos modificados:** `app/config.py`, `.env.example`, `app/regulamento.py`,
+  `app/tools.py`, `app/agentes.py`, `tests/test_regulamento.py`,
+  `tests/test_tools.py`, `tests/test_agentes.py`.
+- **Testes:** `uv run pytest -q` → 23 passaram (fundação + tools + regulamento +
+  topologia dos agentes). Piscina aos domingos retorna "20h"; principal sem
+  regulamento nas instruções; apartamento sempre da sessão; confirmação pendente
+  não grava.
+- **Validação:** API da confirmação do ADK 2.2.0 inspecionada
+  (`ToolContext.request_confirmation`, `requested_tool_confirmations`,
+  `tool_confirmation`). Execução end-to-end do modelo exige `GOOGLE_API_KEY`
+  (fornecida pelo avaliador) — as partes determinísticas são cobertas por testes.
+- **Commits:** sugerido abaixo.
+- **Evidências:** `23 passed`; inspeção da API do ADK.
+- **Problemas:** sem `GOOGLE_API_KEY` no ambiente; validação com o modelo fica para
+  quem tiver a chave. Aviso de depreciação `BaseAgentConfig` (interno do ADK).
+- **Bloqueios:** nenhum para a implementação; validação com modelo depende de chave.
+- **Decisões:** 3 especialistas por domínio (reservas, visitantes, regulamento)
+  via `sub_agents`; confirmação manual com `payload` para popular `detalhes`.
+- **Próximos passos:** Phase 03 (API, Runner/App, confirmações, persistência).
+- **status:** `executada`
+
+> Sugestão de commit (pt-BR, Conventional Commits):
+> `feat: agentes ADK (principal + 3 especialistas) e tools com confirmação e regulamento sob demanda`
+
+---
+
 ## Modelo para novas entradas
 
 ```

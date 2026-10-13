@@ -31,6 +31,10 @@ SESSION_DB_URL = f"sqlite:///{SESSOES_DB}"
 # Identificador da aplicação ADK.
 APP_NAME = "assistente-aurora"
 
+# Modelo Gemini usado pelos agentes (configurável; consulte os modelos e limites
+# ativos no Google AI Studio). Pode ser sobrescrito por GEMINI_MODEL no .env.
+MODELO_GEMINI = os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
+
 
 def garantir_var_dir() -> None:
     """Cria o diretório de armazenamento local, se ainda não existir."""
